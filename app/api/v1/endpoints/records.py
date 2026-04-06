@@ -14,9 +14,9 @@ from app.schemas.common import PaginatedResponse
 from app.services.record_service import RecordService
 from app.models.user import User
 
-router = APIRouter(prefix="/records", tags=["Financial Records"])
+record_router = APIRouter()
 
-@router.get("", response_model=PaginatedResponse[RecordListItem])
+@record_router.get("", response_model=PaginatedResponse[RecordListItem])
 async def list_records(
     type: Optional[str]     = Query(None, pattern="^(income|expense)$"),
     category_id: Optional[int] = Query(None),
@@ -36,7 +36,7 @@ async def list_records(
     )
     return await RecordService(db).list_records(filters)
 
-@router.get("/{record_id}", response_model=RecordResponse)
+@record_router.get("/{record_id}", response_model=RecordResponse)
 async def get_record(
     record_id: str,
     current_user: User = Depends(require_permission("financial_records", "read")),
@@ -44,7 +44,7 @@ async def get_record(
 ):
     return await RecordService(db).get_record(record_id)
 
-@router.post("", response_model=RecordResponse, status_code=201)
+@record_router.post("", response_model=RecordResponse, status_code=201)
 async def create_record(
     payload: RecordCreate,
     current_user: User = Depends(require_permission("financial_records", "create")),
@@ -52,7 +52,7 @@ async def create_record(
 ):
     return await RecordService(db).create_record(payload, actor_id=current_user.id)
 
-@router.patch("/{record_id}", response_model=RecordResponse)
+@record_router.patch("/{record_id}", response_model=RecordResponse)
 async def update_record(
     record_id: str,
     payload: RecordUpdate,
@@ -61,7 +61,7 @@ async def update_record(
 ):
     return await RecordService(db).update_record(record_id, payload, actor_id=current_user.id)
 
-@router.delete("/{record_id}", status_code=204)
+@record_router.delete("/{record_id}", status_code=204)
 async def delete_record(
     record_id: str,
     current_user: User = Depends(require_permission("financial_records", "delete")),
@@ -69,7 +69,7 @@ async def delete_record(
 ):
     await RecordService(db).delete_record(record_id, actor_id=current_user.id)
 
-@router.get("/{record_id}/history", response_model=list[dict])
+@record_router.get("/{record_id}/history", response_model=list[dict])
 async def get_record_history(
     record_id: str,
     current_user: User = Depends(require_permission("financial_records", "read_history")),
