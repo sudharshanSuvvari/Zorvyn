@@ -5,7 +5,7 @@ from app.models.financial_record import FinancialRecord
 from app.repositories.base import BaseRepository
 
 
-class RecordRepository(BaseRepository(FinancialRecord)):
+class RecordRepository(BaseRepository):
 
     async def create(self, data: dict) -> FinancialRecord:
         record = FinancialRecord(**data)
